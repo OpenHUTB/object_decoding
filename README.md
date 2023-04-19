@@ -43,6 +43,8 @@ mex -v weight_out_delay_time.c '-compatibleArrayDims'
 
 ## 数据组织
 
+相关数据和依赖软件的[百度网盘链接](https://pan.baidu.com/s/1aKY7aP0ggQasj9ky9xiwZA) ，提取码：dong
+
 All data should be placed in `matlab/data`.
 Data can be obrained from [figshare](https://figshare.com/articles/Generic_Object_Decoding/7387130).
 The data directory should have the following files:
