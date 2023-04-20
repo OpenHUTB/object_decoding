@@ -1,15 +1,12 @@
-% analysis_CategoryIdentification    Run object category identification
-%
-% Author: Tomoyasu Horikawa <horikawa-t@atr.jp>, Shuntaro C. Aoki <aoki@atr.jp>
+% analysis_CategoryIdentification    运行目标类别识别
 %
 
+clear;
 
-clear all;
 
+%% 初始化设置 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% Initial settings %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%% Data settings
+%% 数据设置
 % subjectList  : List of subject IDs [cell array]
 % featureList  : List of image features [cell array]
 % roiList      : List of RoiList [cell array]
@@ -20,7 +17,7 @@ featureList = {'cnn1', 'cnn2', 'cnn3', 'cnn4', ...
                'hmax1', 'hmax2', 'hmax3', 'gist', 'sift'};
 roiList     = {'V1', 'V2', 'V3', 'V4', 'FFA', 'LOC', 'PPA', 'LVC', 'HVC',  'VC'};
 
-% Image feature data
+% 图像特征数据
 imageFeatureFile = 'ImageFeatures.mat';
 
 %% Directory settings

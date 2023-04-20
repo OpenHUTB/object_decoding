@@ -1,28 +1,19 @@
 # 通用目标解码
-利用 fMRI 激活来预测类别模式。
-
-This repository contains the data and demo codes for replicating results in our paper: [Horikawa and Kamitani (2017) Generic decoding of seen and imagined objects using hierarchical visual features. Nature Communications 8:15037](https://www.nature.com/articles/ncomms15037).
-The generic object decoding approach enabled decoding of arbitrary object categories including those not used in model training.
+利用 fMRI 激活来预测类别模式。 该仓库包括 [论文](https://www.nature.com/articles/ncomms15037) 的数据和演示代码。
+通用目标解码方法能解码任意目标类别（包括再模型训练过程中没有使用的类别）。
 
 
-相关数据和依赖软件的[百度网盘链接](https://pan.baidu.com/s/1aKY7aP0ggQasj9ky9xiwZA) ，提取码：dong
+相关数据和依赖软件的[百度网盘链接](https://pan.baidu.com/s/1aKY7aP0ggQasj9ky9xiwZA) ，提取码：dong。
+```text
+images.zip                 为图像
+ImageFeatures.mat          为图像输入深度模型时的激活
+Subject1-5.mat             为受试看图像时的大脑激活
+preprocessed_fMRI_features 为五个受试已处理的fMRI数据和视觉特征（CNN1-8, HMAX1-3, GIST, and SIFT），
+ds001246-download.tar.gz   为未处理的fMRI数据
+```
+fMRI数据使用[BrainDecoderToolbox2](https://github.com/KamitaniLab/BrainDecoderToolbox2) 和 [bdpy](https://github.com/KamitaniLab/bdpy) 进行处理。
 
-## 数据 (fMRI 数据和视觉特征)
-
-The preprocessed fMRI data for five subjects (training, test_perception, and test_imagery) and visual features (CNN1-8, HMAX1-3, GIST, and SIFT) are available at [figshare](https://figshare.com/articles/Generic_Object_Decoding/7387130).
-The fMRI data were saved as the [BrainDecoderToolbox2](https://github.com/KamitaniLab/BrainDecoderToolbox2)/[bdpy](https://github.com/KamitaniLab/bdpy) format.
-
-The unpreprocessed fMRI data is available at [OpenNeuro](https://openneuro.org/datasets/ds001246).
-
-## 视觉图片
-
-刺激图像位于 `images.zip` 中。
-
-You can request us to share the stimulus images at <https://forms.gle/ujvA34948Xg49jdn9>.
-
-Stimulus images used for higher visual area locazlier experiments in this study are available via <https://forms.gle/c6HGatLrt7JtTGQk7>.
-
-## 示例程序
+该研究中用于高层定位实验的刺激图像可以通过 [链接](https://forms.gle/c6HGatLrt7JtTGQk7) 进行获取。
 
 
 # 通用解码示例
@@ -58,28 +49,20 @@ mex -v weight_out_delay_time.c '-compatibleArrayDims'
             |
             +-- ImageFeatures.mat (image features extracted with Matconvnet)
 
-下载链接:
-
-- [Subject1.mat](https://ndownloader.figshare.com/files/13663487)
-- [Subject2.mat](https://ndownloader.figshare.com/files/13663490)
-- [Subject3.mat](https://ndownloader.figshare.com/files/13663493)
-- [Subject4.mat](https://ndownloader.figshare.com/files/13663496)
-- [Subject5.mat](https://ndownloader.figshare.com/files/13663499)
-- [ImageFeatures.mat](https://ndownloader.figshare.com/files/15015977)
 
 ## 分析
 
 在Matlab中依次运行下列脚本。
 
 ```matlab
-analysis_FeaturePrediction  # （10个CPU运行2天以上）
-analysis_FeaturePredictionAccuracy
-analysis_CategoryIdentification
+analysis_FeaturePrediction          % 特征预测（10个CPU运行2天以上）
+analysis_FeaturePredictionAccuracy  % 特征预测精度
+analysis_CategoryIdentification     % 类别识别
 createfigure  # 绘制 特征解码/类别识别 精度图
 convert_decodedfeatures # 为深度图像重建 转换 特征预测结果
 ```
 
-所有的结果会保存在 `results` 目录中。
+所有的结果会保存在 `results` 目录中，当前处理的文件保存在文件锁`tmp`目录中。
 
 为了可视化结果，运行下列脚本。
 
@@ -87,7 +70,9 @@ convert_decodedfeatures # 为深度图像重建 转换 特征预测结果
 >> createfigure
 ```
 
-`createfigure.m` will create two figures: one shows the results of image feature and category-averaged feature prediction, and the other displays the results of category identification. The figures will be saved in `results` directory in PDF format (`FeaturePredictionAccuracy.pdf` and `IdentificationAccuracy.pdf`).
+`createfigure.m` 会创建两个图像：一个显示图像特征和平均类别特征预测的结果，
+另一个显示类别识别类别识别的结果。
+这些图像会以PDF格式保存在 `result` 目录中（`FeaturePredictionAccuracy.pdf` 和 `IdentificationAccuracy.pdf`）。
 
 
 # 参考
