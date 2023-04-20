@@ -1,8 +1,11 @@
-# Generic Object Decoding
+# 通用目标解码
 利用 fMRI 激活来预测类别模式。
 
 This repository contains the data and demo codes for replicating results in our paper: [Horikawa and Kamitani (2017) Generic decoding of seen and imagined objects using hierarchical visual features. Nature Communications 8:15037](https://www.nature.com/articles/ncomms15037).
 The generic object decoding approach enabled decoding of arbitrary object categories including those not used in model training.
+
+
+相关数据和依赖软件的[百度网盘链接](https://pan.baidu.com/s/1aKY7aP0ggQasj9ky9xiwZA) ，提取码：dong
 
 ## 数据 (fMRI 数据和视觉特征)
 
@@ -13,21 +16,18 @@ The unpreprocessed fMRI data is available at [OpenNeuro](https://openneuro.org/d
 
 ## 视觉图片
 
-For copyright reasons, we do not make the visual images used in our experiments publicly available.
+刺激图像位于 `images.zip` 中。
+
 You can request us to share the stimulus images at <https://forms.gle/ujvA34948Xg49jdn9>.
 
 Stimulus images used for higher visual area locazlier experiments in this study are available via <https://forms.gle/c6HGatLrt7JtTGQk7>.
 
 ## 示例程序
 
-Demo programs for Matlab and Python are available in [code/matlab](code/matlab/) and [code/python](code/python), respectively.
-See README.md in each directory for the details.
 
+# 通用解码示例
 
-
-# Generic Decoding Demo/Matlab
-
-This is MATLAB code for Generic Decoding Demo.
+这是 `Matlab` 的通用解码示例代码。
 
 ## 要求
 
@@ -43,13 +43,10 @@ mex -v weight_out_delay_time.c '-compatibleArrayDims'
 
 ## 数据组织
 
-相关数据和依赖软件的[百度网盘链接](https://pan.baidu.com/s/1aKY7aP0ggQasj9ky9xiwZA) ，提取码：dong
+所有的数据都放在 `workDir`(init.m) 的目录中。
+数据目录中应该有下列文件：
 
-All data should be placed in `matlab/data`.
-Data can be obrained from [figshare](https://figshare.com/articles/Generic_Object_Decoding/7387130).
-The data directory should have the following files:
-
-    data/ --+-- Subject1.mat (fMRI data, subject 1)
+    workDir/--+-- Subject1.mat (fMRI data, subject 1)
             |
             +-- Subject2.mat (fMRI data, subject 2)
             |
@@ -61,7 +58,7 @@ The data directory should have the following files:
             |
             +-- ImageFeatures.mat (image features extracted with Matconvnet)
 
-Download links:
+下载链接:
 
 - [Subject1.mat](https://ndownloader.figshare.com/files/13663487)
 - [Subject2.mat](https://ndownloader.figshare.com/files/13663490)
@@ -72,7 +69,7 @@ Download links:
 
 ## 分析
 
-在Matlab中运行下列脚本。
+在Matlab中依次运行下列脚本。
 
 ```matlab
 analysis_FeaturePrediction  # （10个CPU运行2天以上）
@@ -84,7 +81,7 @@ convert_decodedfeatures # 为深度图像重建 转换 特征预测结果
 
 所有的结果会保存在 `results` 目录中。
 
-To visualize the results, run the following script.
+为了可视化结果，运行下列脚本。
 
 ```
 >> createfigure
