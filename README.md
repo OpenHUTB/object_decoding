@@ -5,11 +5,16 @@
 
 相关数据和依赖软件的[百度网盘链接](https://pan.baidu.com/s/1aKY7aP0ggQasj9ky9xiwZA) ，提取码：dong。
 ```text
-images.zip                 为图像
+images.zip                 为实验所用到的图像
 ImageFeatures.mat          为图像输入深度模型时的激活
 Subject1-5.mat             为受试看图像时的大脑激活
+
 preprocessed_fMRI_features 为五个受试已处理的fMRI数据和视觉特征（CNN1-8, HMAX1-3, GIST, and SIFT），
 ds001246-download.tar.gz   为未处理的fMRI数据
+
+BrainDecoderToolbox2-0.9.17 解码工具箱
+spr_1_0
+
 ```
 fMRI数据使用[BrainDecoderToolbox2](https://github.com/KamitaniLab/BrainDecoderToolbox2) 和 [bdpy](https://github.com/KamitaniLab/bdpy) 进行处理。
 
@@ -20,34 +25,22 @@ fMRI数据使用[BrainDecoderToolbox2](https://github.com/KamitaniLab/BrainDecod
 
 这是 `Matlab` 的通用解码示例代码。
 
-## 要求
-
-- [BrainDecoderToolbox2](https://github.com/KamitaniLab/BrainDecoderToolbox2)
-下载后放置在 `matlab\software\matlab_utils\BrainDecoderToolbox2-0.9.17` 目录中
-
-- [SPR](https://bicr.atr.jp//cbi/sparse_estimation/sato/VBSR.html)
-安装 1.0 版本的 SPR（位于matlab\software\matlab_utils\SPR_2011_1111），代码和.c文件放在同一目录下，并用mex_compile进行重新编译。
-注意：高版本需要在 `mex_compile.m` 中添加兼容性数组维度，否则出现“请求的数组超过预设的最大数组大小”错误。
-```matlab
-mex -v weight_out_delay_time.c '-compatibleArrayDims'
-```
-
 ## 数据组织
 
 所有的数据都放在 `workDir`(init.m) 的目录中。
 数据目录中应该有下列文件：
 
-    workDir/--+-- Subject1.mat (fMRI data, subject 1)
+    workDir/--+-- Subject1.mat (fMRI数据, 受试 1)
             |
-            +-- Subject2.mat (fMRI data, subject 2)
+            +-- Subject2.mat (fMRI数据, 受试 2)
             |
-            +-- Subject3.mat (fMRI data, subject 3)
+            +-- Subject3.mat (fMRI数据, 受试 3)
             |
-            +-- Subject4.mat (fMRI data, subject 4)
+            +-- Subject4.mat (fMRI数据, 受试 4)
             |
-            +-- Subject5.mat (fMRI data, subject 5)
+            +-- Subject5.mat (fMRI数据, 受试 5)
             |
-            +-- ImageFeatures.mat (image features extracted with Matconvnet)
+            +-- ImageFeatures.mat (使用Matconvnet提取的图像特征)
 
 
 ## 分析
@@ -55,11 +48,11 @@ mex -v weight_out_delay_time.c '-compatibleArrayDims'
 在Matlab中依次运行下列脚本。
 
 ```matlab
-analysis_FeaturePrediction          % 特征预测（10个CPU运行2天以上）
-analysis_FeaturePredictionAccuracy  % 特征预测精度
-analysis_CategoryIdentification     % 类别识别
-createfigure  # 绘制 特征解码/类别识别 精度图
-convert_decodedfeatures # 为深度图像重建 转换 特征预测结果
+>> analysis_FeaturePrediction          % 特征预测（10个CPU运行2天以上）
+>> analysis_FeaturePredictionAccuracy  % 特征预测精度
+>> analysis_CategoryIdentification     % 类别识别
+>> createfigure                        % 绘制 特征解码/类别识别 精度图
+>> convert_decodedfeatures             % 为深度图像重建 转换 特征预测结果
 ```
 
 所有的结果会保存在 `results` 目录中，当前处理的文件保存在文件锁`tmp`目录中。
@@ -74,6 +67,27 @@ convert_decodedfeatures # 为深度图像重建 转换 特征预测结果
 另一个显示类别识别类别识别的结果。
 这些图像会以PDF格式保存在 `result` 目录中（`FeaturePredictionAccuracy.pdf` 和 `IdentificationAccuracy.pdf`）。
 
+
+## 工具箱说明
+
+- [BrainDecoderToolbox2](https://github.com/KamitaniLab/BrainDecoderToolbox2)
+下载后放置在 `matlab\software\matlab_utils\BrainDecoderToolbox2-0.9.17` 目录中
+
+- [SPR](https://bicr.atr.jp//cbi/sparse_estimation/sato/VBSR.html)
+安装 1.0 版本的 SPR（放置在`matlab\software\matlab_utils\SPR_2011_1111`），代码和.c文件放在同一目录下，并用mex_compile进行重新编译。
+注意：高版本需要在 `mex_compile.m` 中添加兼容性数组维度，否则出现“请求的数组超过预设的最大数组大小”错误。
+```matlab
+mex -v weight_out_delay_time.c '-compatibleArrayDims'
+```
+
+- [Matconvnet](https://www.vlfeat.org/matconvnet/install/) 
+编译步骤：进入`matconvnet`所在的目录，运行
+```commandline
+addpath('matlab')
+vl_compilenn
+```
+执行`vl_compilenn`编译错误`Unable to find cl.exe`
+将目录`C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.21.27702\bin\Hostx64\x64`添加到环境变量中。
 
 # 参考
 [代码](https://github.com/KamitaniLab/GenericObjectDecoding) 
