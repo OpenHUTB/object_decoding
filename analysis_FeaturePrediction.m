@@ -1,15 +1,12 @@
 % analysis_FeaturePrediction    
 % 运行特征预测（根据fMRI来推测特征，并推断图片的类别）
 
-clear;
 
-% 运行之前需要修改的路径
-utils_dir = fullfile(matlabroot, 'software', 'matlab_utils'); % spr_1_0 和 BrainDecoderToolbox2-0.9.17 所在的目录
-workDir = 'D:\data\neuro\object_decoding';  % 原始数据、中间文件、结果文件 所在的目录
+% 运行之前需要删除之前临时目录中的文件锁，不然results\Subject1\V1中会没有cnn1.mat-cnn5.mat
+if exist("resultsDir", 'dir'); rmdir(resultsDir, 's'); end
+if exist("lockDir", "dir"); rmdir(fullfile(workDir, 'tmp'), 's'); end
 
-% 获得工程的路径
-proj_dir = mfilename("fullpath");
-for i = 1 : 4; proj_dir = fileparts(proj_dir); end
+
 
 % https://bicr.atr.jp//cbi/sparse_estimation/sato/VBSR.html
 % 稀疏估计工具箱
@@ -46,13 +43,6 @@ featureList  = {'cnn1', 'cnn2', 'cnn3', 'cnn4', ...
 % 图像特征数据
 imageFeatureFile = 'ImageFeatures.mat';
 
-%% 目录设置
-if ~exist(workDir, 'dir')
-    workDir = pwd;
-end
-dataDir = workDir;       % 包含大脑和图像特征数据的目录
-resultsDir = fullfile(workDir, 'results'); % 保存分析结果的目录
-lockDir = fullfile(workDir, 'tmp');        % 保存文件锁（正在分析的过程）的目录
 
 %% 结果文件名设置
 resultFileNameFormat = @(s, r, f) fullfile(resultsDir, sprintf('%s/%s/%s.mat', s, r, f));

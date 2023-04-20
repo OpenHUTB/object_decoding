@@ -1,9 +1,8 @@
 % analysis_FeaturePredictionAccuracy
 % 计算特征预测的精度
 
-clear;
-
-%% 初始化设置
+cur_dir = fileparts(mfilename('fullpath'));
+run(fullfile(cur_dir, 'init.m'));
 
 %% 数据设置
 % subjectList  : 受试 IDs （元胞数组）
@@ -17,11 +16,6 @@ roiList     = {'V1', 'V2', 'V3', 'V4', 'FFA', 'LOC', 'PPA', 'LVC', 'HVC',  'VC'}
 
 % Image feature data
 imageFeatureFile = 'ImageFeatures.mat';
-
-%% Directory settings
-workDir = pwd;
-dataDir = fullfile(workDir, 'data');       % Directory containing brain and image feature data
-resultsDir = fullfile(workDir, 'results'); % Directory to save analysis results
 
 %% File name settings
 predResultFileNameFormat = @(s, r, f) fullfile(resultsDir, sprintf('%s/%s/%s.mat', s, r, f));
@@ -44,13 +38,13 @@ if ~exist(resultsDir, 'dir'), mkdir(resultsDir); end
 %% Load data
 %%----------------------------------------------------------------------
 
-%% Load image features
+%% 加载图像特征
 fprintf('Loading image feature data...\n');
 
 [feat.dataSet, feat.metaData] = load_data(fullfile(dataDir, imageFeatureFile));
 
 %%----------------------------------------------------------------------
-%% Create analysis parameter matrix (analysisParam)
+%% 创建分析参数举证 (analysisParam)
 %%----------------------------------------------------------------------
 
 analysisParam = uint16(zeros(length(subjectList) * length(roiList) * length(featureList), 3));

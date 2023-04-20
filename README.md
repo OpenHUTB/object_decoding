@@ -82,7 +82,7 @@ createfigure  # 绘制 特征解码/类别识别 精度图
 convert_decodedfeatures # 为深度图像重建 转换 特征预测结果
 ```
 
-The all results will be saved in `results` directory.
+所有的结果会保存在 `results` 目录中。
 
 To visualize the results, run the following script.
 
