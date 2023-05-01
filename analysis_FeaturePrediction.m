@@ -6,23 +6,7 @@
 if exist("resultsDir", 'dir'); rmdir(resultsDir, 's'); end
 if exist("lockDir", "dir"); rmdir(fullfile(workDir, 'tmp'), 's'); end
 
-
-
-% https://bicr.atr.jp//cbi/sparse_estimation/sato/VBSR.html
-% 稀疏估计工具箱
-% 需要使用max_compile进行编译，然后运行： mex -v weight_out_delay_time.c '-compatibleArrayDims'
-addpath(fullfile(utils_dir, "spr_1_0"));
-% addpath(fullfile('lib', 'SPR_2009_12_17'));
-% addpath(fullfile(utils_dir, 'SPR_2011_1111'));  % 报错：函数或变量 'Tall' 无法识别。
-
-
-% 大脑解码工具箱
-cur_dir = pwd;
-brain_decoder_toolbox_dir = fullfile(utils_dir, 'BrainDecoderToolbox2-0.9.17/');
-cd(brain_decoder_toolbox_dir);
-run('setpath.m');
-cd(cur_dir);
-
+run(fullfile(fileparts(mfilename('fullpath')), 'init.m'));
 
 %% 初始化设置
 
@@ -235,8 +219,8 @@ for n = 1:size(analysisParam, 1)
     predictPercept = [];  % 感知测试的预测标签
     predictImagery = [];  % 想像测试的预测标签
 
-    % numUnits = size(trainFeat, 2);  % 当前脑区的体素数：1000
-    numUnits = 100;  % 减少单元数，进行快速测试
+    numUnits = size(trainFeat, 2);  % 当前脑区的体素数：1000
+    % numUnits = 100;  % 减少单元数，进行快速测试
 
     % 训练集：150个类别 * 每个类别8张图像 = 1200张图（每个只呈现一次）
     for i = 1:numUnits  % 对每个体素都构建一个线性模型进行特征预测

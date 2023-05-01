@@ -5,14 +5,16 @@
 % Author: Tomoyasu Horikawa <horikawa-t@atr.jp>, Shuntaro C. Aoki <aoki@atr.jp>
 %
 
-clear all;
+clear;
+cur_dir = fileparts(mfilename('fullpath'));
+run(fullfile(cur_dir, 'init.m'));
 
-%% Data settings
-resultsDir = './results/';
+%% 数据设置
+% resultsDir = './results/';
 resultsFileFeatPred = fullfile(resultsDir, 'FeaturePrediction.mat');
 resultsFileCatIdent = fullfile(resultsDir, 'CategoryIdentification.mat');
 
-%% Figure settings
+%% 图像设置
 fontSize = 5;
 lineWidth = 2;
 subplotMargin = 0.13;
@@ -21,7 +23,7 @@ figureProperties = {'Color', 'white'};
 axesProperties = {'Box', 'off', ...
                   'TickDir', 'out'};
 
-%% Load results
+%% 加载结果
 resFeatPred = load(resultsFileFeatPred);
 resCatIdent = load(resultsFileCatIdent);
 
@@ -52,18 +54,18 @@ end
 end
 end
 
-%% Visualize results: feature decoding accuracy
-%  Seen image feature & imagined category-average feature decoding accuracy
+%% 可视化结果：特征解码精度
+%  看图像的特征 & 想像类别平均特征解码精度
 
 dataType = {'seen:image', 'seen:category', 'imagined:category'};
 
-% Figure settings
+% 图形设置
 numRow = 14;
 numCol = 6;
 add = 3;
 [plotOrder, numRow, numCol] = get_subplot_order([numRow, numCol], 'lbu', [3, 0]);
 
-% Visualize results
+% 可视化结果
 hf = makefigure('fullscreen');
 set(hf, figureProperties{:});
 
@@ -90,7 +92,7 @@ for iData = 1:length(dataType)
         yax = -0.2:0.2:0.4;
     end
 
-    % Calculate mean and confidence interval
+    % 计算平均和置信度区间
     mu = squeeze(mean(dat, 1));
     ci = tinv(0.95, numSbj - 1) .* squeeze(std(dat, [], 1)) ./ sqrt(numSbj);
     
@@ -101,17 +103,17 @@ for iData = 1:length(dataType)
         set(ha, 'FontSize', fontSize);
         hold on;
 
-        % Draw data
+        % 数据绘制
         bar(ha, mu(:, ix), ...
             'facecolor', col{1}, ...
             'edgecolor', 'none', ...
             'LineWidth', lineWidth);
         errorbar_h(ha, mu(:, ix), ci(:, ix), '.k');
 
-        % Draw horizontal lines
+        % 水平线绘制
         hline(yax, '-k');
 
-        % Draw text
+        % 文本绘制
         text(1, -0.1, ...
              sprintf('%s; %s', dataType{iData}, featureList{ix}), ...
              'FontSize', fontSize);
@@ -129,7 +131,7 @@ for iData = 1:length(dataType)
         draw_axes_label(yax, 2, yax);
         ylim(range);
 
-        % Set axes parameters
+        % 设置坐标轴参数
         set(ha, axesProperties{:});
     end
 end
@@ -138,17 +140,17 @@ suptitle(sprintf('Seen image feature and seen/imagined category-average feature 
 
 savefigure(hf, fullfile(resultsDir, 'FeaturePredictionAccuracy.pdf'));
 
-%% Visualize results: identification accuracy
+%% 可视化结果：识别精度
 
 dataType = {'seen', 'imagined'};
 
-% figure settings
+% 图形设置
 numRow = 14;
 numCol = 6;
 add = 3;
 [plotOrder, numRow, numCol] = get_subplot_order([numRow, numCol], 'lbu', [3, 1]);
 
-% Visualize results
+% 可视化结果
 hf = makefigure('fullscreen');
 set(hf, figureProperties{:});
 
@@ -164,7 +166,7 @@ for iData = 1:length(dataType)
             dat = results.catIdent.imagery;
     end
 
-    % Calculate mean and confidence interval
+    % 计算平均和置信度区间
     mu = squeeze(mean(dat, 1));
     ci = tinv(0.95, numSbj - 1) .* squeeze(std(dat, [], 1)) ./ sqrt(numSbj);
     
@@ -175,24 +177,24 @@ for iData = 1:length(dataType)
         set(ha, 'FontSize', fontSize);
         hold on;
 
-        % Draw data
+        % 数据绘制
         bar(ha, mu(:, ix) * 100, ...
             'facecolor', col{1}, ...
             'edgecolor', 'none', ...
             'LineWidth', lineWidth);
         errorbar_h(ha, mu(:, ix) * 100, ci(:, ix) * 100, '.k');
 
-        % Draw horizontal lines
+        % 水平线绘制
         hline(50, '-k')
         hl = hline(60:10:100, '-');
         set(hl, 'Color', col{1});
 
-        % Draw text
+        % 文本额绘制
         text(1, 95, ...
              sprintf('%s: %s', dataType{iData}, featureList{ix}), ...
              'FontSize', fontSize);
 
-        % x and y axis
+        % x 和 y 轴
         if ix == 1 || ix == 9
             draw_axes_label(roiList, 1);
         else
@@ -204,10 +206,10 @@ for iData = 1:length(dataType)
         ylim([40, 100]);
 
         
-        % Set axes parameters
+        % 设置坐标轴参数
         set(ha, axesProperties{:});
     end
-end % image category
+end % 图像类别
 
 suptitle(sprintf('Seen and imagined category identification accuracy'));
 

@@ -8,12 +8,16 @@
 
 clear;
 
-addpath(fullfile(matlabroot, 'utils', 'spm12'));
+%% 目录设置
+cur_dir = fileparts(mfilename('fullpath'));
+run(fullfile(cur_dir, 'init.m'));
+
+addpath(fullfile(matlabroot, 'software', 'matlab_utils', 'spm12'));
 
 for i = 1:5
-    bdata_file    = sprintf('./data/Subject%0d.mat', i);
-    template_file = sprintf('./data/Subject%0d_SpaceTemplate.nii', i);
-    output_file   = sprintf('./data/Subject%0d_Func.nii', i);
+    bdata_file    = fullfile(workDir, sprintf( 'Subject%0d.mat', i));
+    template_file = fullfile(workDir, 'preprocessed_fMRI_features', sprintf('Subject%0d_SpaceTemplate.nii', i));
+    output_file   = fullfile(resultsDir, sprintf('Subject%0d_Func.nii', i));
     
     [dataset, metadata] = load_data(bdata_file);
 

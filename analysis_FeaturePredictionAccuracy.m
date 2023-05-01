@@ -20,6 +20,7 @@ imageFeatureFile = 'ImageFeatures.mat';
 %% File name settings
 predResultFileNameFormat = @(s, r, f) fullfile(resultsDir, sprintf('%s/%s/%s.mat', s, r, f));
 resultFile = fullfile(resultsDir, 'FeaturePrediction.mat');
+if exist(resultFile, 'file'); delete(resultFile); end
 
 
 %% Analysis Main %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -34,18 +35,16 @@ addpath(genpath('./lib'));
 
 if ~exist(resultsDir, 'dir'), mkdir(resultsDir); end
 
-%%----------------------------------------------------------------------
+
 %% Load data
-%%----------------------------------------------------------------------
 
 %% 加载图像特征
 fprintf('Loading image feature data...\n');
 
 [feat.dataSet, feat.metaData] = load_data(fullfile(dataDir, imageFeatureFile));
 
-%%----------------------------------------------------------------------
+
 %% 创建分析参数举证 (analysisParam)
-%%----------------------------------------------------------------------
 
 analysisParam = uint16(zeros(length(subjectList) * length(roiList) * length(featureList), 3));
 
@@ -59,9 +58,8 @@ end
 end
 end
 
-%%----------------------------------------------------------------------
+
 %% Analysis loop
-%%----------------------------------------------------------------------
 
 results = [];
 

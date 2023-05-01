@@ -20,6 +20,8 @@ fMRI数据使用[BrainDecoderToolbox2](https://github.com/KamitaniLab/BrainDecod
 
 该研究中用于高层定位实验的刺激图像可以通过 [链接](https://forms.gle/c6HGatLrt7JtTGQk7) 进行获取。
 
+一些测试图片是从ILSVRC 2012的训练图片中获取，位于[data/stimulus_info_ImageNetTest.csv](https://github.com/KamitaniLab/GenericObjectDecoding/blob/master/data/stimulus_info_ImageNetTest.csv) 。
+
 
 # 通用解码示例
 
@@ -75,7 +77,7 @@ fMRI数据使用[BrainDecoderToolbox2](https://github.com/KamitaniLab/BrainDecod
 
 - [SPR](https://bicr.atr.jp//cbi/sparse_estimation/sato/VBSR.html)
 安装 1.0 版本的 SPR（放置在`matlab\software\matlab_utils\SPR_2011_1111`），代码和.c文件放在同一目录下，并用mex_compile进行重新编译。
-注意：高版本需要在 `mex_compile.m` 中添加兼容性数组维度，否则出现“请求的数组超过预设的最大数组大小”错误。
+注意：高版本matlab需要在 `mex_compile.m` 中添加兼容性数组维度，否则出现“请求的数组超过预设的最大数组大小”错误。
 ```matlab
 mex -v weight_out_delay_time.c '-compatibleArrayDims'
 ```
@@ -88,6 +90,15 @@ vl_compilenn
 ```
 执行`vl_compilenn`编译错误`Unable to find cl.exe`
 将目录`C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.21.27702\bin\Hostx64\x64`添加到环境变量中。
+
+# 其他
+降低深度模型层和对应脑区的激活之间的损失。
+
+# 问题
+如果运行完`analysis_FeaturePrediction.m`后，结果文件中每个受试的总文件大小不是`2.17 GB (2,340,685,118 字节)`，而是`224 MB (235,368,488 字节)`的话，则原因是以下代码设置成了快速测试。
+```markdown
+numUnits = size(trainFeat, 2);
+```
 
 # 参考
 [代码](https://github.com/KamitaniLab/GenericObjectDecoding) 

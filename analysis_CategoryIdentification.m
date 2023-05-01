@@ -1,12 +1,13 @@
 % analysis_CategoryIdentification    运行目标类别识别
-%
 
-clear;
+%% 目录设置
+cur_dir = fileparts(mfilename('fullpath'));
+run(fullfile(cur_dir, 'init.m'));
 
 
-%% 初始化设置 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 初始化设置 
 
-%% 数据设置
+% 数据设置
 % subjectList  : List of subject IDs [cell array]
 % featureList  : List of image features [cell array]
 % roiList      : List of RoiList [cell array]
@@ -20,42 +21,34 @@ roiList     = {'V1', 'V2', 'V3', 'V4', 'FFA', 'LOC', 'PPA', 'LVC', 'HVC',  'VC'}
 % 图像特征数据
 imageFeatureFile = 'ImageFeatures.mat';
 
-%% Directory settings
-workDir = pwd;
-dataDir = fullfile(workDir, 'data');       % Directory containing brain and image feature data
-resultsDir = fullfile(workDir, 'results'); % Directory to save analysis results
 
-%% File name settings
+%% 文件名设置
 predResultFile = fullfile(resultsDir, 'FeaturePrediction.mat');
 resultFile = fullfile(resultsDir, 'CategoryIdentification.mat');
 
 
-%% Analysis Main %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 分析主程序
 
 fprintf('%s started\n', mfilename);
 
-%%----------------------------------------------------------------------
-%% Initialization
-%%----------------------------------------------------------------------
+
+%% 初始化
 
 addpath(genpath('./lib'));
 
 if ~exist(resultsDir, 'dir'), mkdir(resultsDir); end;
 
-%%----------------------------------------------------------------------
-%% Load data
-%%----------------------------------------------------------------------
 
-%% Load image features
+%% 加载数据
+
+% 加载图像特征
 fprintf('Loading image feature data...\n');
 
 [feat.dataSet, feat.metaData] = load_data(fullfile(dataDir, imageFeatureFile));
 
-%%----------------------------------------------------------------------
-%% Create analysis parameter matrix (analysisParam)
-%%----------------------------------------------------------------------
-
-analysisParam = uint16(zeros(length(subjectList) * length(roiList) * length(featureList), 3));
+%% 创建分析参数矩阵 (analysisParam)
+% 5个受试 * 10个roi * 13个特征层
+analysisParam = uint16(zeros(length(subjectList) * length(roiList) * length(featureList), 3)); 
 
 c = 1;
 for iSbj = 1:length(subjectList)
@@ -67,23 +60,21 @@ end
 end
 end
 
-%%----------------------------------------------------------------------
-%% Analysis loop
-%%----------------------------------------------------------------------
 
+%% 分析循环
 featpred = load(predResultFile);
 
 results = [];
 for n = 1:size(analysisParam, 1)
 
-    %% Initialization --------------------------------------------------
+    %% 初始化
 
-    % Get data index in the current analysis
+    % 在当前分析中获得数据索引
     iSbj = analysisParam(n, 1);
     iRoi = analysisParam(n, 2);
     iFeat = analysisParam(n, 3);
 
-    % Set analysis ID and a result file name
+    % 设置分析ID和结果文件名
     analysisId = sprintf('%s-%s-%s-%s', ...
                          mfilename, ...
                          subjectList{iSbj}, ...
@@ -92,34 +83,34 @@ for n = 1:size(analysisParam, 1)
 
     % Check or double-running
     if checkfiles(resultFile)
-        % Analysis result already exists
+        % 分析结果已经存在就跳过
         fprintf('The analysis is already done and skipped\n');
         continue;
     end
 
     fprintf('Start %s\n', analysisId);
 
-    %% Get image features ----------------------------------------------
+    %% 获得图像特征
     layerFeat = select_feature(feat.dataSet, feat.metaData, ...
                               sprintf('%s = 1', featureList{iFeat}));
     catIds = get_dataset(feat.dataSet, feat.metaData, 'CatID');
     featType = get_dataset(feat.dataSet, feat.metaData, 'FeatureType');
 
-    %% Load data (unit_all) --------------------------------------------
+    %% 加载数据 (unit_all) --------------------------------------------
     ind = strcmp({featpred.results(:).subject}, subjectList{iSbj}) ...
           & strcmp({featpred.results(:).roi}, roiList{iRoi}) ...
           & strcmp({featpred.results(:).feature}, featureList{iFeat});
 
-    % TODO: add index check
+    % TODO: 增加索引检查
 
     predPercept = featpred.results(ind).predictPercept;
     predImagine = featpred.results(ind).predictImagery;
 
     categoryPercept = featpred.results(ind).categoryTestPercept;
 
-    %% Object category identification analysis -------------------------
+    %% 目标类别识别分析
 
-    %% Get category features
+    %% 获得类别特征
     featCatTest = layerFeat(featType == 3, :);
     catIdsCatTest = catIds(featType == 3, :);
 
@@ -128,15 +119,16 @@ for n = 1:size(analysisParam, 1)
     featCatOther = layerFeat(featType == 4, :);
     catIdCatOther = catIds(featType == 4, :);
 
-    %% Pairwise identification
+    %% 配对识别
     labels = 1:size(featCatTest, 1);
-    candidate = [featCatTest; featCatOther];
+    candidate = [featCatTest; featCatOther(1:50, :)];  % 测试类别特征；其他类别特征  
 
-    % Seen categories
+    % 所见到的类别
     simmat = fastcorr(predPercept', candidate');
-    correctRate.perception = pwidentification(simmat, labels);
+%     simmat = fastcorr(predPercept, featCatTest); % simmat = fastcorr(predPercept', candidate');
+    correctRate.perception = pwidentification(simmat, labels);  % 两个输入数组的非单一维度必须相互匹配。
 
-    % Imagined catgories
+    % 所想到的类别
     simmat = fastcorr(predImagine', candidate');
     correctRate.imagery = pwidentification(simmat, labels);
 
@@ -152,7 +144,7 @@ for n = 1:size(analysisParam, 1)
     results(n).correctRateImageryAve = mean(correctRate.imagery);
 end
 
-%% Save data -----------------------------------------------------------
+%% 保存数据
 save(resultFile, 'results', '-v7.3');
 
 fprintf('%s done\n', mfilename);

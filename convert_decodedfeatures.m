@@ -20,7 +20,11 @@
 %
 
 
-clear all;
+clear;
+
+%% 目录设置
+cur_dir = fileparts(mfilename('fullpath'));
+run(fullfile(cur_dir, 'init.m'));
 
 
 %% Initial settings %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -37,9 +41,9 @@ featureList  = {'cnn1', 'cnn2', 'cnn3', 'cnn4', 'cnn5', 'cnn6', 'cnn7', 'cnn8'};
 network = 'matconvnet';
 
 %% Directory settings
-workDir = pwd;
-resultsDir = fullfile(workDir, 'results'); % Directory to save analysis results
-outputDir = fullfile(workDir, 'decodedfeatures');  % Directory to save converted decoded features
+% workDir = pwd;
+% resultsDir = fullfile(workDir, 'results'); % Directory to save analysis results
+outputDir = fullfile(resultsDir, 'decodedfeatures');  % Directory to save converted decoded features
 
 %% File name settings
 resultFileNameFormat = @(s, r, f) fullfile(resultsDir, sprintf('%s/%s/%s.mat', s, r, f));
