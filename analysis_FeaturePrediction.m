@@ -42,6 +42,7 @@ fprintf('%s started\n', mfilename);
 
 %% 初始化
 addpath(genpath('./lib'));
+%addpath函数用于将指定路径添加到MATLAB的搜索路径中，genpath('./lib')函数会返回一个包含'./lib'目录下所有子目录的字符向量
 
 setupdir(resultsDir);
 setupdir(lockDir);
@@ -101,6 +102,7 @@ fprintf('Loading image feature data...\n');
 analysisParam = uint16(zeros(length(subjectList) * length(roiList) * length(featureList), 3));
 
 c = 1;
+%三重循环的作用是生成所有可能的subject、ROI和特征的组合方案，并将它们的索引保存到数组analysisParam中
 for iSbj = 1:length(subjectList)
 for iRoi = 1:length(roiList)
 for iFeat = 1:length(featureList)
@@ -116,6 +118,7 @@ end
 
 
 %% 分析循环（受试数*ROI数*目标网络层数）
+%获取数组analysisParam的行数。对于analysisParam中的每一行，执行以下操作。
 for n = 1:size(analysisParam, 1)
 
     %% 初始化
@@ -149,6 +152,7 @@ for n = 1:size(analysisParam, 1)
     end
 
     fprintf('Start %s\n', analysisId);
+    %lockcompt这段代码的作用是开始运行当前分析任务，并将任务锁定，防止其他程序同时运行相同的任务。将锁定信息保存到文件中，可以保证同一时间只有一个程序可以运行相同的任务。
     lockcomput(analysisId, lockDir);
 
     %% 加载数据
@@ -156,11 +160,15 @@ for n = 1:size(analysisParam, 1)
     %% 得到大脑数据
     voxSelector = sprintf('ROI_%s = 1', roiList{iRoi});
     nVox = numVoxelList{iRoi};
-
+    
+    %select_data函数会根据输入的数据集和元数据，以及选择脑区的字符串，返回选择的脑区数据。例如，如果需要选择的脑区是v1，那么返回的数据将只包含脑区v1的数据，即nVox_v1 x nTimepoints的矩阵。
     brainData = select_data(dat(iSbj).dataSet, dat(iSbj).metaData, voxSelector);
 
+    %类型：DataType=1为训练数据，DataType=2测试数据
     dataType = get_dataset(dat(iSbj).dataSet, dat(iSbj).metaData, 'DataType');
+    %Label选择的数据分别对应metadata描述的4469列：刺激ID；4470列：种类索引；4471列：图片索引；
     labels = get_dataset(dat(iSbj).dataSet, dat(iSbj).metaData, 'Label');
+    %得到第一列数据，即4469列数据
     labels = labels(:,1);
 
     % dataType
@@ -203,22 +211,28 @@ for n = 1:size(analysisParam, 1)
     trainFeat = layerFeat(featType == 1, :);  % 16622x1000 -> 1200x1000
     trainImageIds = imageIds(featType == 1, :);  % 16622x1 -> 1200x1 
 
+    %使用get_refdata函数根据trainImageIds和trainLabels的值，从trainFeat中提取出训练数据，并将它们存储在trainFeat中。
     trainFeat = get_refdata(trainFeat, trainImageIds, trainLabels); % 1200x1000 <- (1200x1000,1200x1,1200x1)
 
     %% 预处理
     %% 正则化大脑数据 1200x1004
+    %使用zscore函数对训练数据trainData进行标准化处理，使其满足均值为0、标准差为1的正态分布，并将其存储在trainData中。同时，将标准化所需的均值和标准差分别存储在xMean和xNorm中。
     [trainData, xMean, xNorm] = zscore(trainData);  % 将输入矩阵 按列 变换到 均值为0，标准差为1
 
+    %使用bsxfun函数对测试感性数据testPerceptData进行归一化处理，具体包括：先将testPerceptData中的每个元素减去xMean，然后将得到的结果除以xNorm。最后将处理后的结果存储在testPerceptData中。
     testPerceptData = bsxfun(@rdivide, bsxfun(@minus, testPerceptData, xMean), xNorm); % 1750x1004
+    %使用bsxfun函数对测试想象数据testImageryData进行归一化处理，具体也是先将其每个元素减去xMean，然后将得到的结果除以xNorm。最后将处理后的结果存储在testImageryData中。
     testImageryData = bsxfun(@rdivide, bsxfun(@minus, testImageryData, xMean), xNorm); % 500x1004
 
     %% 正则化图像特征
+    %使用zscore函数对训练特征trainFeat进行标准化处理，使其满足均值为0、标准差为1的正态分布，并将其存储在trainFeat中。同时，将标准化所需的均值和标准差分别存储在yMean和yNorm中。
     [trainFeat, yMean, yNorm] = zscore(trainFeat);  % 1200x1000
 
     %% 特征预测
     predictPercept = [];  % 感知测试的预测标签
     predictImagery = [];  % 想像测试的预测标签
 
+    %使用size函数获取trainFeat的数据尺寸，具体包括样本数和特征数。由于需要获取的是特征数，因此选取size函数的第二个输出参数（即列数），将其存储在numUnits中。
     numUnits = size(trainFeat, 2);  % 当前脑区的体素数：1000
     % numUnits = 100;  % 减少单元数，进行快速测试
 
@@ -232,6 +246,7 @@ for n = 1:size(analysisParam, 1)
         %% 基于相关性进行体素的选择
         % 在回归分析中，在 训练图片会话中，对目标变化 显示出最高相关系数 的体素 ，被选来预测每个特征。
         % 对V1-V4, LOC, FFA 和 PPA 最多500个体素；对LVC, HVC 和 VC 最多1000个体素
+        %使用fastcorr函数计算trainData和yTrain之间的相关系数矩阵cor，即每个训练数据和当前特征向量之间的相关性
         cor = fastcorr(trainData, yTrain); % 1004x1 <- (1200x1004,1200x1)
         % 根据1200张图像的y值，从1004个体素中选择相关性最高的nVox(500)个体素
         [xTrain, selInd] = select_top(trainData, abs(cor), nVox); % [1200x500,1x1004] <- (1200x1004,1004x1,500)
@@ -274,13 +289,15 @@ for n = 1:size(analysisParam, 1)
     end
 
     %% 对每个类别的预测做平均
+    %获取测试数据集的感知类别标签，并使用unique函数将其转换为唯一的整数值categoryTestPercept，以便后续的分类和分析
     categoryTestPercept = unique(floor(testPerceptLabels));
     categoryTestImagery = unique(floor(testimageryLabels));
-
+    %初始化predictPerceptAveraged数组为空，以便后续存储不同类别的预测输出结果
     predictPerceptAveraged = [];
     predictImageryAveraged = [];
     for j = 1:length(categoryTestPercept)
         categ = categoryTestPercept(j);
+        %根据当前循环的类别标签，从predictPercept数组中获取对应类别的所有预测输出值，并使用mean函数计算它们的平均值。最终将平均值存储在predictPerceptAveraged数组中相应位置。
         predictPerceptAveraged(j, :) = mean(predictPercept(floor(testPerceptLabels) == categ, :));
     end
     for j = 1:length(categoryTestImagery)
@@ -289,7 +306,9 @@ for n = 1:size(analysisParam, 1)
     end
 
     %% 保存数据
+    %使用fileparts函数获取resultFile的路径（rDir）、文件名（rFileBase）和扩展名（rExt），并将它们存储在对应的变量中。
     [rDir, rFileBase, rExt] = fileparts(resultFile);
+    %使用setupdir函数设置当前工作目录为rDir，即结果文件所在的目录。
     setupdir(rDir);
 
     save(resultFile, ...
