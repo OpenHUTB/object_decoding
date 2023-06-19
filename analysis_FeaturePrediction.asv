@@ -225,14 +225,12 @@ for n = 1:size(analysisParam, 1)
     testImageryData = bsxfun(@rdivide, bsxfun(@minus, testImageryData, xMean), xNorm); % 500x1004
 
     %% 正则化图像特征
-    %使用zscore函数对训练特征trainFeat进行标准化处理，使其满足均值为0、标准差为1的正态分布，并将其存储在trainFeat中。同时，将标准化所需的均值和标准差分别存储在yMean和yNorm中。
     [trainFeat, yMean, yNorm] = zscore(trainFeat);  % 1200x1000
 
     %% 特征预测
     predictPercept = [];  % 感知测试的预测标签
     predictImagery = [];  % 想像测试的预测标签
 
-    %使用size函数获取trainFeat的数据尺寸，具体包括样本数和特征数。由于需要获取的是特征数，因此选取size函数的第二个输出参数（即列数），将其存储在numUnits中。
     numUnits = size(trainFeat, 2);  % 当前脑区的体素数：1000
     % numUnits = 100;  % 减少单元数，进行快速测试
 
@@ -246,7 +244,6 @@ for n = 1:size(analysisParam, 1)
         %% 基于相关性进行体素的选择
         % 在回归分析中，在 训练图片会话中，对目标变化 显示出最高相关系数 的体素 ，被选来预测每个特征。
         % 对V1-V4, LOC, FFA 和 PPA 最多500个体素；对LVC, HVC 和 VC 最多1000个体素
-        %使用fastcorr函数计算trainData和yTrain之间的相关系数矩阵cor，即每个训练数据和当前特征向量之间的相关性
         cor = fastcorr(trainData, yTrain); % 1004x1 <- (1200x1004,1200x1)
         % 根据1200张图像的y值，从1004个体素中选择相关性最高的nVox(500)个体素
         [xTrain, selInd] = select_top(trainData, abs(cor), nVox); % [1200x500,1x1004] <- (1200x1004,1004x1,500)
@@ -289,15 +286,13 @@ for n = 1:size(analysisParam, 1)
     end
 
     %% 对每个类别的预测做平均
-    %获取测试数据集的感知类别标签，并使用unique函数将其转换为唯一的整数值categoryTestPercept，以便后续的分类和分析
     categoryTestPercept = unique(floor(testPerceptLabels));
     categoryTestImagery = unique(floor(testimageryLabels));
-    %初始化predictPerceptAveraged数组为空，以便后续存储不同类别的预测输出结果
+
     predictPerceptAveraged = [];
     predictImageryAveraged = [];
     for j = 1:length(categoryTestPercept)
         categ = categoryTestPercept(j);
-        %根据当前循环的类别标签，从predictPercept数组中获取对应类别的所有预测输出值，并使用mean函数计算它们的平均值。最终将平均值存储在predictPerceptAveraged数组中相应位置。
         predictPerceptAveraged(j, :) = mean(predictPercept(floor(testPerceptLabels) == categ, :));
     end
     for j = 1:length(categoryTestImagery)
@@ -306,9 +301,7 @@ for n = 1:size(analysisParam, 1)
     end
 
     %% 保存数据
-    %使用fileparts函数获取resultFile的路径（rDir）、文件名（rFileBase）和扩展名（rExt），并将它们存储在对应的变量中。
     [rDir, rFileBase, rExt] = fileparts(resultFile);
-    %使用setupdir函数设置当前工作目录为rDir，即结果文件所在的目录。
     setupdir(rDir);
 
     save(resultFile, ...
