@@ -152,7 +152,8 @@ for n = 1:size(analysisParam, 1)
     end
 
     fprintf('Start %s\n', analysisId);
-    %lockcompt这段代码的作用是开始运行当前分析任务，并将任务锁定，防止其他程序同时运行相同的任务。将锁定信息保存到文件中，可以保证同一时间只有一个程序可以运行相同的任务。
+    %lockcompt这段代码的作用是开始运行当前分析任务，并将任务锁定，防止其他程序同时运行相同的任务。
+    % 将锁定信息保存到文件中，可以保证同一时间只有一个程序可以运行相同的任务。
     lockcomput(analysisId, lockDir);
 
     %% 加载数据

@@ -125,7 +125,7 @@ for n = 1:size(analysisParam, 1)
 
     % 所见到的类别
     simmat = fastcorr(predPercept', candidate');
-%     simmat = fastcorr(predPercept, featCatTest); % simmat = fastcorr(predPercept', candidate');
+    % simmat = fastcorr(predPercept, featCatTest); % simmat = fastcorr(predPercept', candidate');
     correctRate.perception = pwidentification(simmat, labels);  % 两个输入数组的非单一维度必须相互匹配。
 
     % 所想到的类别
